@@ -11,8 +11,8 @@
     <Names xsi:type='typens:ArrayOfString'>
       <String>PythonModule</String>
       <String>ClassName</String>
-      <String>r1</String>
-      <String>r2</String>
+      <String>Raster1</String>
+      <String>Raster2</String>
       <String>R</String>
       <String>G</String>
       <String>B</String>
@@ -20,17 +20,23 @@
     </Names>
     <Values xsi:type='typens:ArrayOfAnyType'>
       <AnyType xsi:type='xs:string'>Cloud_correction_and_averaging.py</AnyType>
-      <AnyType xsi:type='xs:string'>CCA</AnyType>
+      <AnyType xsi:type='xs:string'>Cloud_correction_and_averaging</AnyType>
       <Argument xsi:type="typens:RasterFunctionVariable">
-        <Name>r1</Name>
+        <Name>Raster1</Name>
         <Description>'Raster 1: Must be a 4-band raster (RGB and NIR)'</Description>
         <Value></Value>
+        <Aliases xsi:type="typens:ArrayOfString">
+          <String>RasterAlias1</String>
+        </Aliases>
         <IsDataset>true</IsDataset>
       </Argument>
       <Argument xsi:type="typens:RasterFunctionVariable">
-        <Name>r2</Name>
+        <Name>Raster2</Name>
         <Description>'Raster 2: Must be a 4-band raster (RGB and NIR) in same order as the first raster'</Description>
         <Value></Value>
+        <Aliases xsi:type="typens:ArrayOfString">
+          <String>RasterAlias2</String>
+        </Aliases>
         <IsDataset>true</IsDataset>
       </Argument>
       <AnyType xsi:type='typens:RasterFunctionVariable'>

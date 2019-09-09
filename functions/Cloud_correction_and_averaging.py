@@ -15,7 +15,7 @@ class Cloud_correction_and_averaging():
     def getParameterInfo(self):
         return [
             {
-                'name': 'r1',
+                'name': 'Raster1',
                 'dataType': 'raster',
                 'value': None,
                 'required': True,
@@ -23,7 +23,7 @@ class Cloud_correction_and_averaging():
                 'description': "Must be a 4-band raster (RGB & NIR)"
             },
             {
-                'name': 'r2',
+                'name': 'Raster2',
                 'dataType': 'raster',
                 'value': None,
                 'required': True,
@@ -70,9 +70,9 @@ class Cloud_correction_and_averaging():
         bG = int(scalars.get('G', 2))
         bB = int(scalars.get('B', 3))
         bNIR = int(scalars.get('NIR', 4))
-        
+
         return {
-          'extractBands': (bR - 1, bG - 1, bB - 1, bNIR - 1),   # we want all the bands, but since they might not be in expected order, we extract them anyway. 
+          'extractBands': (bR - 1, bG - 1, bB - 1, bNIR - 1),   # we want all the bands, but since they might not be in expected order, we extract them anyway.
           'compositeRasters': True,             # output is multi-band.
           'inheritProperties': 4 | 8,           # inherit all but the pixel type and NoData from the input raster
           'invalidateProperties': 2 | 4 | 8,    # reset any statistics and histogram that might be held by the parent dataset (because this function modifies pixel values).
@@ -81,7 +81,7 @@ class Cloud_correction_and_averaging():
 
 
     # updateRasterInfo() enables you to define the location and dimensions of the output raster.
-    def updateRasterInfo(self, **kwargs): #The keyword argument kwargs contains all user-specified scalar values and information associated with each input rasters. 
+    def updateRasterInfo(self, **kwargs): #The keyword argument kwargs contains all user-specified scalar values and information associated with each input rasters.
         pixelType = 'u2' # unsigned integer 16 bit
 
         kwargs['output_info']['bandCount'] = 4            # output is a 4-band raster
@@ -130,7 +130,7 @@ class Cloud_correction_and_averaging():
 
     def updateKeyMetadata(self, names, bandIndex, **keyMetadata):
         if bandIndex == -1:
-            keyMetadata['datatype'] = 'Processed'               # outgoing raster is now 'Processed' 
+            keyMetadata['datatype'] = 'Processed'               # outgoing raster is now 'Processed'
         elif bandIndex == 0:
             keyMetadata['bandname'] = 'Red'
         elif bandIndex == 1:
