@@ -5,7 +5,7 @@ class ARVI():
     def __init__(self):
         self.name = "ARVI Function"
         self.description = "Computes the Atmospherically Resistant Vegetation Index given a raster's Red, Blue, and Infrared bands."
-        self.applyScaling = True
+        self.applyScaling = False
         self.applyColormap = False
 
 
@@ -32,8 +32,8 @@ class ARVI():
                 'dataType': 'numeric',
                 'value': 3,
                 'required': True,
-                'displayName': "Red Band Index",
-                'description': "The index of the red band. The first band has index 1."
+                'displayName': "Blue Band Index",
+                'description': "The index of the blue band. The first band has index 1."
             },
             {
                 'name': 'ir',
@@ -65,7 +65,7 @@ class ARVI():
           'extractBands': (red - 1, blue - 1, ir - 1),    # extract only the bands we need.
           'compositeRasters': False,            # input is a single raster, band compositing doesn't apply.
           'inheritProperties': 4 | 8,           # inherit all but the pixel type and NoData from the input raster
-          'invalidateProperties': 2 | 4 | 8,    # reset any statistics and histogram that might be held by the parent dataset (because this function modifies pixel values). 
+          'invalidateProperties': 2 | 4 | 8,    # reset any statistics and histogram that might be held by the parent dataset (because this function modifies pixel values).
           'inputMask': False                    # Don't need input raster mask in .updatePixels().
         }
 
@@ -74,7 +74,7 @@ class ARVI():
         method = kwargs.get('method', 'Colormap').lower()
         self.applyColormap = method == 'colormap'
         self.applyScaling = self.applyColormap or method == 'grayscale'
-              
+
         maximumValue = 1.0
         if self.applyScaling:                                   # maximum output value depends on whether we are scaling
             maximumValue = 200.0
@@ -89,7 +89,7 @@ class ARVI():
                         np.array([255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 20, 23, 25, 33, 38, 40, 43, 48, 54, 59, 61, 64, 69, 77, 79, 82, 87, 92, 97, 99, 102, 107, 115, 120, 123, 125, 130, 138, 141, 143, 150, 156, 163, 165, 168, 173, 181, 186, 186, 187, 180, 176, 173, 169, 163, 157, 150, 146, 142, 136, 132, 126, 123, 119, 114, 108, 105, 101, 96, 93, 88, 84, 81, 77, 70, 68, 64, 60, 55, 49, 47, 45, 37, 33, 28, 24, 21, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], dtype='uint8'))
 
         kwargs['output_info']['bandCount'] = 1            # output is a single band raster
-        kwargs['output_info']['statistics'] = ({'minimum': 0.0, 'maximum': maximumValue}, )  # we know something about the stats of the outgoing ARVI raster. 
+        kwargs['output_info']['statistics'] = ({'minimum': 0.0, 'maximum': maximumValue}, )  # we know something about the stats of the outgoing ARVI raster.
         kwargs['output_info']['histogram'] = ()           # we know nothing about the histogram of the outgoing raster.
         kwargs['output_info']['pixelType'] = pixelType    # bit-depth of the outgoing ARVI raster based on user-specified parameters
         kwargs['output_info']['colormap'] = colormap      # optional colormap if requesting for an color image
@@ -103,8 +103,8 @@ class ARVI():
         ir = np.array(inBlock[2], dtype='f4')
 
         np.seterr(divide='ignore')
-        rb = np.subtract(red, np.subtract(blue, red))
-        outBlock = (ir - rb) / (ir + rb)                      # compute ARVI
+        rb = np.subtract(red, blue)
+        outBlock = ((ir - red) - rb) / ((ir + red) - rb)        # compute ARVI
         if self.applyScaling:
             outBlock = (outBlock * 100.0) + 100.0               # apply a scale and offset to the the ARVI, if needed.
 
@@ -116,7 +116,7 @@ class ARVI():
         if bandIndex == -1:
             keyMetadata['datatype'] = 'Processed'               # outgoing raster is now 'Processed'
         elif bandIndex == 0:
-            keyMetadata['wavelengthmin'] = None                 # reset inapplicable band-specific key metadata 
+            keyMetadata['wavelengthmin'] = None                 # reset inapplicable band-specific key metadata
             keyMetadata['wavelengthmax'] = None
             keyMetadata['bandname'] = 'ARVI'
         return keyMetadata
