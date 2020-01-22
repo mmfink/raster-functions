@@ -20,27 +20,28 @@ class ReplaceNulls():
             {
                 'name': 'fill_val',
                 'dataType': 'numeric',
-                'value': 1,
+                'value': 65535,
                 'required': True,
-                'displayName': 'Replace Value',
-                'description': 'Value to replace with'
+                'displayName': 'New NoData',
+                'description': 'New NoData value to use'
             }
         ]
 
     def getConfiguration(self, **scalars):
         return {
-            'inheritProperties': 1 | 2 | 4 | 8,         # inherit everything but the pixel type (1) and NoData (2)
-            #'invalidateProperties': 1 | 2 | 4 | 8,      # invalidate histogram and statistics because we are modifying pixel values
-            'resampling': False
+            'inheritProperties': 1 | 4 | 8,       # inherit everything but NoData (2)
+            'inputMask': True    #the input masks are made available in the pixelBlocks keyword
         }
 
     def updateRasterInfo(self, **kwargs):
         
-        self.fill_val = float(kwargs['fill_val'])
-        # repeat stats for all output raster bands
-        #kwargs['output_info']['statistics'] = tuple(outStats for i in range(self.out_band_count))
-        kwargs['output_info']['pixelType'] = 'f4'
-        kwargs['output_info']['statistics'] = ()
+        self.fill_val = kwargs['fill_val']
+        bands = kwargs['raster_info']['bandCount']
+        pixtype = kwargs['raster_info']['pixelType']
+
+        kwargs['output_info']['bandCount'] = bands
+        kwargs['output_info']['pixelType'] = pixtype
+        kwargs['output_info']['noData'] = np.array(np.full(bands, fill_value=self.fill_val, dtype=pixtype))
 
         return kwargs
 

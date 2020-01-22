@@ -27,7 +27,7 @@
         <Value xsi:type="xs:double">1</Value>
         <IsDataset>false</IsDataset>
       </AnyType>
-      <AnyType xsi:type="xs:string">C:\PROJECTS\gbrunner-raster-functions\functions\ReplaceNulls.py</AnyType>
+      <AnyType xsi:type="xs:string">ReplaceNulls.py</AnyType>
       <AnyType xsi:type="typens:RasterFunctionVariable" id="ID7">
         <Name>ClassName</Name>
         <Description></Description>
